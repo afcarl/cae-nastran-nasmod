@@ -385,14 +385,14 @@ __END__
 
 =head1 NAME
 
-Nastran - basic access to nastran models
+Nasmod - basic access to nastran models
 
 =head1 SYNOPSIS
 
-    use CAE::Nastranmodel;
+    use Nasmod;
 
     # create object of a nastran model
-    my $model = new Nastranmodel();
+    my $model = new Nasmod();
 
 	# import content from a nastran file
 	$model->import("file.inc");
@@ -465,7 +465,7 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
 
     # define options and filter
     my %OPTIONS = (
-        cards => ["GRID", "CTRIA"],          # fastest way to reduce data while importing. only mentioned cardnames will be imported. the values in 'cards' match
+        cards => ["GRID", "CTRIA"],         # fastest way to reduce data while importing. only mentioned cardnames will be imported. the values in 'cards' match
                                             # without anchors "TRIA" matches "CTRIA3" and "CTRIA6"
         filter => ["", "", 10],             # filter. only the content passing this filter will be imported. use the same dataformat as in filter().
         maxoccur => 5                       # stops the import if this amount of entities is reached in current import.
