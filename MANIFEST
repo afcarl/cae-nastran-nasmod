@@ -2,7 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/model.nas
+model.nas
 t/testFilter.t
 t/testImport.t
 t/testTheRest.t
