@@ -4,9 +4,10 @@ require Exporter;
 
 use strict;
 
-use vars qw($VERSION);
+use vars qw($VERSION $DATE);
 
-$VERSION           = '0.20';
+$VERSION           = '[% version %]';
+$DATE              = '[% date %]';
 
 sub new
 {

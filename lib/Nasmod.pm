@@ -4,9 +4,10 @@ require Exporter;
 
 use strict;
 use Nasmod::Entity;
-use vars qw($VERSION $ABSTRACT);
+use vars qw($VERSION $ABSTRACT $DATE);
 
-$VERSION           = '0.20';
+$VERSION           = '[% version %]';
+$DATE              = '[% date %]';
 $ABSTRACT          = 'basic access to nastran models';
 
 sub new
