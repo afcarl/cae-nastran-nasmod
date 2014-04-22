@@ -10,7 +10,7 @@ use CAE::Nastran::Nasmod;
 # 1) addEntity, getEntity, merge
 {
 	my $model = Nasmod->new();
-	$model->importBulk("model.nas");
+	$model->importBulk("spl/model.nas");
 	
 	# entity count
 	ok($model->count(), 6);
@@ -40,7 +40,7 @@ use CAE::Nastran::Nasmod;
 	ok(@entities, 2);
 	
 	my $model2 = Nasmod->new();
-	$model2->importBulk("model.nas");
+	$model2->importBulk("spl/model.nas");
 	
 	$model->merge($model2);
 	

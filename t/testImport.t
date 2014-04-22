@@ -10,7 +10,7 @@ use CAE::Nastran::Nasmod;
 # 1) testing full import
 {
 	my $model = Nasmod->new();
-	$model->importBulk("model.nas");
+	$model->importBulk("spl/model.nas");
 	
 	# entity count
 	ok($model->count(), 6);
@@ -25,7 +25,7 @@ use CAE::Nastran::Nasmod;
 	my %OPTIONS = (
 		cards => ["GRID", "CTRIA"],
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 5);
 }
 #------------------------------
@@ -37,7 +37,7 @@ use CAE::Nastran::Nasmod;
 	my %OPTIONS = (
 		filter => ["", ["GRID","CTRIA3"]],
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 5);
 }
 #------------------------------
@@ -50,7 +50,7 @@ use CAE::Nastran::Nasmod;
 		cards => ["GRID"],
 		maxoccur => 2
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 2);
 }
 #------------------------------
@@ -63,7 +63,7 @@ use CAE::Nastran::Nasmod;
 		cards => ["GRID"],
 		filter => ["", "", "4"]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 1);
 }
 #------------------------------
@@ -75,7 +75,7 @@ use CAE::Nastran::Nasmod;
 	my %OPTIONS = (
 		filter => ["234567"]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 
 	ok($model->count(), 2);
 }
@@ -89,7 +89,7 @@ use CAE::Nastran::Nasmod;
 #		cards => ["GRID"],
 		filter => ["wichtig"]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 1);
 }
 #------------------------------
@@ -102,7 +102,7 @@ use CAE::Nastran::Nasmod;
 		cards => ["GRID"],
 		filter => ["wichtig"]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 0);
 }
 #------------------------------
@@ -115,7 +115,7 @@ use CAE::Nastran::Nasmod;
 		cards => ["GRID"],
 		filter => [["wichtig", "234567"]]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 1);
 }
 #------------------------------
@@ -128,7 +128,7 @@ use CAE::Nastran::Nasmod;
 		cards => ["GRID"],
 		filter => ["", "", "", "", "", "", "", "", "", "", "", "", 198]
 	);
-	$model->importBulk("model.nas", \%OPTIONS);
+	$model->importBulk("spl/model.nas", \%OPTIONS);
 	ok($model->count(), 1);
 }
 #------------------------------
