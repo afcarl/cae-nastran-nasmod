@@ -6,5 +6,5 @@ model.nas
 t/testFilter.t
 t/testImport.t
 t/testTheRest.t
-lib/Nasmod.pm
-lib/Nasmod/Entity.pm
+lib/CAE/Nastran/Nasmod.pm
+lib/CAE/Nastran/Nasmod/Entity.pm
