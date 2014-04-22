@@ -1,6 +1,7 @@
 package Nasmod;
 
 use strict;
+use warnings;
 use CAE::Nastran::Nasmod::Entity;
 use vars qw($VERSION $ABSTRACT $DATE);
 
@@ -497,7 +498,7 @@ only bulk data is supported. only 8-field nastran format is supported. the large
 
 =head1 NEXTSTEPS
 
-implement index to accelerate filtering
+implement index, ...
 
 =head1 TAGS
 

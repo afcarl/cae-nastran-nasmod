@@ -1,6 +1,7 @@
 package Entity;
 
 use strict;
+use warnings;
 use vars qw($VERSION $DATE);
 
 $VERSION           = '[% version %]';
@@ -102,7 +103,6 @@ sub getCol
 sub getRow
 {
 	my $self = shift;
-	
 	return @{$self->{'content'}}
 }
 #---------------------

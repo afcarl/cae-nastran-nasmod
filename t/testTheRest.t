@@ -1,7 +1,7 @@
 use strict;
 use Test;
 
-BEGIN { plan tests => 6 }
+BEGIN { plan tests => 7 }
 
 #use lib("../lib");
 use CAE::Nastran::Nasmod;
@@ -34,6 +34,8 @@ use CAE::Nastran::Nasmod;
 	ok(@entities, 1);
 	
 	$entity2->setCol(1, "JIPEE");
+	
+	ok($entity2->getRow(), 1);
 	
 	@entities = $model->getEntity(["", "JIPEE"]);
 	

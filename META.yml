@@ -10,7 +10,7 @@
     license  => [ 'perl_5' ],
     no_index  => {
     	directory => ['spl/model.nas' ],
-    }
+    },
     prereqs => {
       runtime => {
         requires => {
@@ -22,6 +22,16 @@
           'Test' => '0',
         },
       }
+    },
+    provides => {
+    	'CAE::Nastran::Nasmod' => {
+    		file => 'lib/CAE/Nastran/Nasmod.pm',
+    		version => '[% version %]',
+    	},
+    	'CAE::Nastran::Nasmod::Entity' => {
+    		file => 'lib/CAE/Nastran/Nasmod/Entity.pm',
+    		version => '[% version %]',
+    	},
     },
     resources => {
       license => ['http://dev.perl.org/licenses/'],
