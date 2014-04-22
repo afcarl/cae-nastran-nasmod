@@ -1,9 +1,7 @@
 package Nasmod;
 
-require Exporter;
-
 use strict;
-use Nasmod::Entity;
+use CAE::Nastran::Nasmod::Entity;
 use vars qw($VERSION $ABSTRACT $DATE);
 
 $VERSION           = '[% version %]';
@@ -26,7 +24,11 @@ sub new
     return $self;
 }
 
-# ausgabe der daten inkl. der schluesselzeilen in der shell
+#---------------------
+# prints the whole model
+# print()
+# return: -
+#---------------------
 sub print
 {
     my $self = shift;
@@ -36,59 +38,7 @@ sub print
 		$entity->print();
 	}
 }
-
-## rueckgabe der daten inkl. der schluesselzeilen in der shell
-## es kann angegeben werden nach welcher Spalte aufsteigend sortiert werden soll
-#sub sprint
-#{
-#    my $self = shift;
-#    my $sortcol;
-#    if (@_)
-#    {
-#    	$sortcol = shift;
-#    }
-#	my $return;
-#	
-#	# sortierte ausgabe
-#	if (defined $sortcol)
-#	{
-#		my @unsorted;
-#		foreach my $entity (@{$self->{'bulk'}})
-#		{
-#			push(@unsorted, $entity->getrow($sortcol));
-#		}
-#		
-#		# dupletten eliminieren
-#		my %seen = ();
-#		my @uniq_unsorted = grep { ! $seen{$_} ++ } @unsorted;
-#		
-#		# sortieren
-#		my @sorted = sort { $a <=> $b } @uniq_unsorted;
-#		
-#		foreach my $bla (@sorted)
-#		{
-#			foreach my $entity (@{$self->{'bulk'}})
-#			{
-#				if ($bla eq $entity->getrow($sortcol))
-#				{
-#					$entity->sprint();
-#					$return .= $entity->sprint();
-#				}
-#			}
-#		}
-#		return $return;
-#	}
-#	
-#	# unsortierte ausgabe
-#	else
-#	{
-#		foreach my $entity (@{$self->{'bulk'}})
-#		{
-#			$return .= $entity->sprint();
-#		}
-#		return $return;
-#	}
-#}
+#---------------------
 
 #---------------------
 # imports data from a nastran file
@@ -279,19 +229,18 @@ sub addEntity
 #---------------------
 
 #---------------------
-# adds an entity to show
+# gets the entities that match the filter. if no filter is given, returns all entities
 # getEntity(\@filter)
 # return: @allEntitiesThatMatch
 #---------------------
 sub getEntity
 {
 	my $self = shift;
-	my $refh_filter;
 
 	# if a filter is given
 	if(@_)
 	{
-		$refh_filter = shift;
+		my $refh_filter = shift;
 		my $newModel = $self->filter($refh_filter);
 		return $newModel->getEntity();
 	}
@@ -360,18 +309,25 @@ sub getCol
 #---------------------
 
 #---------------------
-# merge
+# merges models to this model
+# merge(Nasmod, Nasmod, ...)
+# return: -
+#---------------------
 sub merge
 {
 	my $self = shift;
-	my $zusaetzliches_model = shift;
-
-	push(@{$self->{bulk}}, @{$zusaetzliches_model->{bulk}});
+	foreach my $model (@_)
+	{
+		push @{$self->{'bulk'}}, @{$model->{'bulk'}};
+	}
 }
 #---------------------
 
 #---------------------
 # count_entities
+# count()
+# return: int
+#---------------------
 sub count
 {
 	my $self = shift;
@@ -389,67 +345,19 @@ Nasmod - basic access to nastran models
 
 =head1 SYNOPSIS
 
-    use Nasmod;
+    use CAE::Nastran::Nasmod;
 
     # create object of a nastran model
     my $model = new Nasmod();
 
 	# import content from a nastran file
-	$model->import("file.inc");
+	$model->importBulk("file.inc");
 
-	# import content from a second nastran file, merges with existing content
-	# but this time only import the entities of type GRID or CQUAD4
-	$model->import("file2.inc", {cards => ["GRID", "CQUAD4"]});
+	# filter for GRIDs
+	my $model2 = $model->filter("", "GRID");
 
-	# import content from a third nastran file and merge with existing content
-	# only import the entities of type GRID or CTRIA
-	# filter for row2=5
-	my @filter = ("", "", "5");
-	$model->import("file3.inc", {cards => ["GRID", "CTRIA"], filter => \@filter});
-
-	# create a new model, that contains all the grids of the model
-	# only entities that match "" for the comment entry
-	# only entities that match "GRID" for row1 
-	my $newModel1 = $model->filter(["", "GRID"]);
-
-	# create a new model, that contains all the grids of the model with 99 < NID < 200
-	# only entities that match "" for the comment entry
-	# only entities that match "GRID" for row1 
-	# only entities that match "1\d\d" for row2 
-	my $newModel2 = $model->filter(["", "GRID", "1\d\d"]);
-
-	# create a new model, that contains all the grids of the model with 99 < NID < 200 AND 299 < NID < 400
-	# only entities that match "" for the comment entry
-	# only entities that match "GRID" for row1 
-	# only entities that match "1\d\d" OR "3\d\d" for row2 
-	my $newModel3 = $model->filter(["", "GRID", ["1\d\d", "3\d\d"]]);
-
-	# create a new model, that contains all 
-	# only entities that match "CTRIA.+" OR "CQUAD.*" for row1 (all shell Elements) 
-	my $newModel4 = $model->filter(["", ["CTRIA.+", "CQUAD.*"]);
-
-	# prints a model to stdout (in nastran format)
-	$newModel4->print();
-
-	# get the row2 of all entities, in this case all Element-Ids
-	my @row2ofAllEntities = $newModel3->getrow(2);
-
-	# get all entities
-	my @allEntities = $newModel4->getEntities();
-
-	foreach my $entity (@allEntities)
-	{
-		# set row2 to the value "17" (col2 of shells: EID)
-		$entity->setCol(2, 17);
-		# offset the value of row3 (col3 of shells: PID)
-		$entity->setCol(3, $entity->getCol(2)+100); 
-	}
-
-	# merges $newModel3 into $newModel2
-	$newModel2->merge($newModel3);
-
-	# $newModel2 contains how many entities?
-	$newModel2->count();
+	# write GRIDs to new file
+	$model2->print("newFile.nas");
 
 =head1 DESCRIPTION
 
@@ -486,7 +394,7 @@ returns a new Nastranmodel with only the entities that pass the whole filter. A 
 
     # filter for GRID (NID=1000)
     my @filter = (
-        "",                   # pos 0 filters comment:  entities pass which match // in the comment. (comment/empty => no anchors in the regex)
+        "",                   # pos 0 filters comment:  entities pass which match // in the comment. (comment => no anchors in the regex)
         "GRID",               # pos 1 filters column 1: only entities pass which match /^GRID$/ in column 1. (note the anchors in the regex)
         "1000"                # pos 2 filters column 2: entities pass which match /^1000$/ in column 2. (note the anchors in the regex)
         ""                    # pos 3 filters column 3: entities pass which match // in column 3. (empty => no anchors in the regex)
@@ -557,10 +465,16 @@ merges two models.
 
 =item * getCol()
 
-returns the amount of entities defined in the model
+returns the desired column of every entity in the model as an array.
 
     my $model2 = $model->filter(["", "GRID"]);     # returns a Nastranmodel $model2 that contains only the GRIDs of $model
-    $model2->getCol(2);                            # returns an array with all GRID-IDs (column 2) of $model2
+    my @col2   = $model2->getCol(2);               # returns an array with all GRID-IDs (column 2) of $model2
+
+=item * getRow()
+
+returns all data columns of an entity as an array.
+
+    my @row = $entity->getRow();
 
 =item * count()
 
@@ -579,7 +493,15 @@ prints the whole model in nastran format to STDOUT or to a file if a valid path 
 
 =head1 LIMITATIONS
 
-only bulk data is supported. only 8-field nastran format supported. if you use it with very large models (millions of cards) filtering gets slow -> no form of indexing is implemented.
+only bulk data is supported. only 8-field nastran format is supported. the larger the model in memory, the slowier gets filtering -> no indexing.
+
+=head1 NEXTSTEPS
+
+implement index to accelerate filtering
+
+=head1 TAGS
+
+CA, CAE, FEA, FEM, Nastran, Finite Elements, perl, CAE Automation, CAE Automatisierung
 
 =head1 AUTHOR
 

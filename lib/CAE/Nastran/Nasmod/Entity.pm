@@ -1,9 +1,6 @@
 package Entity;
 
-require Exporter;
-
 use strict;
-
 use vars qw($VERSION $DATE);
 
 $VERSION           = '[% version %]';
@@ -94,6 +91,19 @@ sub getCol
 		return $self->{content}->[$col-1];
 	}
 	else {return""};
+}
+#---------------------
+
+#---------------------
+# get all data
+# getRow()
+# return: @<string>
+#---------------------
+sub getRow
+{
+	my $self = shift;
+	
+	return @{$self->{'content'}}
 }
 #---------------------
 

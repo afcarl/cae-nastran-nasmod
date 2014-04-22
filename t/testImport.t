@@ -3,8 +3,8 @@ use Test;
 
 BEGIN { plan tests => 10 }
 
-use lib("../lib");
-use Nasmod;
+#use lib("../lib");
+use CAE::Nastran::Nasmod;
 
 #------------------------------
 # 1) testing full import

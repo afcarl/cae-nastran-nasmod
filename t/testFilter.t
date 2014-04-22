@@ -3,8 +3,9 @@ use Test;
 
 BEGIN { plan tests => 8 }
 
-use lib("../lib");
-use Nasmod;
+#use lib("lib");
+#use lib("../lib");
+use CAE::Nastran::Nasmod;
 
 #------------------------------
 # 1), 2) testing filter
