@@ -485,10 +485,9 @@ returns the amount of all entities stored in the model
 
 =item * print()
 
-prints the whole model in nastran format to STDOUT or to a file if a valid path is given.
+prints the whole model in nastran format to STDOUT
 
     $model->print();              # prints to STDOUT
-    $model->print("myModel.nas")  # prints to file 'myModel.nas'
 
 =back
 

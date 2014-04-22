@@ -3,7 +3,6 @@ Makefile.PL
 MANIFEST
 META.yml
 README
-model.nas
 t/testFilter.t
 t/testImport.t
 t/testTheRest.t
