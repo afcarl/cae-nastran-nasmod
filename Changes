@@ -13,3 +13,6 @@ Revision history for Perl extension Nasmod.
 
 0.23 Wed Apr 23
     - packagename changed
+
+0.24 Wed Apr 23
+    - error corrections
