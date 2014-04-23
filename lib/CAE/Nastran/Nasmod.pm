@@ -161,7 +161,7 @@ sub parse
     			}
     			
     			# ein neues entity anlegen
-    			$entity = Entity->new();
+    			$entity = CAE::Nastran::Nasmod::Entity->new();
     			$entity->setComment(@comment);
     			undef(@comment);
     			
@@ -276,7 +276,7 @@ sub filter
 	}
 
 	# ein neues objekt erzeugen
-	my $filtered_model = Nasmod->new();
+	my $filtered_model = CAE::Nastran::Nasmod->new();
 
 # alle entities durchgehen
 	foreach my $entity (@{$self->{'bulk'}})
@@ -349,7 +349,7 @@ CAE::Nastran::Nasmod - basic access to nastran models
     use CAE::Nastran::Nasmod;
 
     # create object of a nastran model
-    my $model = new Nasmod();
+    my $model = CAE::Nastran::Nasmod->new();
 
     # import content from a nastran file
     $model->importBulk("file.inc");
@@ -436,7 +436,7 @@ returns all entities or only entities that pass a filter.
 adds entities to a model.
 
     # create new Entities
-    my $entity = Entity->new();
+    my $entity = CAE::Nastran::Nasmod::Entity->new();
 
     $entity->setComment("just a test"); # comment
     $entity->setCol(1, "GRID");         # column 1: cardname
@@ -445,7 +445,7 @@ adds entities to a model.
     $entity->setCol(5, 120);            # column 5: y
     $entity->setCol(6, 88);             # column 6: z
 
-    my $entity2 = Entity->new(); 
+    my $entity2 = CAE::Nastran::Nasmod::Entity->new(); 
     $entity2->setComment("another test", "this is the second line of the comment");
     $entity2->setCol(1, "GRID");
     $entity2->setCol(2, 1001);
