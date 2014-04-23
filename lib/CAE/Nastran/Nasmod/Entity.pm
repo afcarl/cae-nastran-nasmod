@@ -1,4 +1,4 @@
-package Entity;
+package CAE::Nastran::Nasmod::Entity;
 
 use strict;
 use warnings;
