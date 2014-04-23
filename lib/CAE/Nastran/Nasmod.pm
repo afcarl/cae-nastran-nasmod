@@ -1,4 +1,4 @@
-package Nasmod;
+package CAE::Nastran::Nasmod;
 
 use strict;
 use warnings;
