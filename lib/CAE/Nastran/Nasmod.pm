@@ -342,7 +342,7 @@ __END__
 
 =head1 NAME
 
-Nasmod - basic access to nastran models
+CAE::Nastran::Nasmod - basic access to nastran models
 
 =head1 SYNOPSIS
 
@@ -351,14 +351,14 @@ Nasmod - basic access to nastran models
     # create object of a nastran model
     my $model = new Nasmod();
 
-	# import content from a nastran file
-	$model->importBulk("file.inc");
+    # import content from a nastran file
+    $model->importBulk("file.inc");
 
-	# filter for GRIDs
-	my $model2 = $model->filter("", "GRID");
+    # filter for GRIDs
+    my $model2 = $model->filter("", "GRID");
 
-	# write GRIDs to new file
-	$model2->print("newFile.nas");
+    # write GRIDs to new file
+    $model2->print("newFile.nas");
 
 =head1 DESCRIPTION
 
@@ -366,18 +366,16 @@ import a nastran model from files, filter content, extract data, overwrite data,
 
 =head1 API
 
-=over 4
-
-=item * import()
+=head2 import()
 
 imports a Nastran model from file. it only imports nastran bulk data. no sanity checks will be performed - duplicate ids or the like are possible.
 
     # define options and filter
     my %OPTIONS = (
         cards => ["GRID", "CTRIA"],         # fastest way to reduce data while importing. only mentioned cardnames will be imported. the values in 'cards' match
-                                            # without anchors "TRIA" matches "CTRIA3" and "CTRIA6"
-        filter => ["", "", 10],             # filter. only the content passing this filter will be imported. use the same dataformat as in filter().
-        maxoccur => 5                       # stops the import if this amount of entities is reached in current import.
+                                            # without a trailing anchor "CTRIA" matches "CTRIA3" and "CTRIA6"
+        filter => ["", "", 10],             # only the content passing this filter will be imported. same dataformat as in filter().
+        maxoccur => 5                       # stops the import if this amount of entities has been imported.
     )
 
     # create object of a nastran model
@@ -389,7 +387,7 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
     # adds only the bulk data of the file, that passes the filter
     $model->import("file2.inc", \%OPTIONS);
 
-=item * filter()
+=head2 filter()
 
 returns a new Nastranmodel with only the entities that pass the whole filter. A filter is an array of regexes. $filter[0] is the regex for the comment, $filter[1] is the regex for column 1 of the nastran cards, $filter[2] is the regex for column 2 ... A nastran card passes a filter if every filter-entry matches the correspondent column or comment. Everything passes an empty filter-entry. The filter-entry for the comment matches without anchors. filter-entries for data columns will always match with anchors (^$). A filter-entry for a column may be an array with alternatives - in this case only one alternative has to match.
 
@@ -425,7 +423,15 @@ returns a new Nastranmodel with only the entities that pass the whole filter. A 
 
     my $filteredModel3 = $model->filter(\@filter3);
 
-=item * addEntity()
+=head2 getEntity()
+
+returns all entities or only entities that pass a filter.
+
+    my @allEntities = $model->getEntitiy();
+
+    my @certainEntities = $model->getEntity(\@filter);
+
+=head2 addEntity()
 
 adds entities to a model.
 
@@ -450,58 +456,48 @@ adds entities to a model.
     # adds the entities to the model
     $model->addEntity($entity, $entity2);
 
-=item * getEntity()
+=head2 getRow()
 
-returns all entities or only entities that pass a filter.
+returns all data columns of an entity as an array.
 
-    my @allEntities = $model->getEntitiy();
+    my @row = $entity->getRow();
 
-    my @certainEntities = $model->getEntity(\@filter);
-
-=item * merge()
+=head2 merge()
 
 merges two models.
 
     $model1->merge($model2);    # $model2 is beeing merged into model1
 
-=item * getCol()
+=head2 getCol()
 
 returns the desired column of every entity in the model as an array.
 
     my $model2 = $model->filter(["", "GRID"]);     # returns a Nastranmodel $model2 that contains only the GRIDs of $model
     my @col2   = $model2->getCol(2);               # returns an array with all GRID-IDs (column 2) of $model2
 
-=item * getRow()
-
-returns all data columns of an entity as an array.
-
-    my @row = $entity->getRow();
-
-=item * count()
+=head2 count()
 
 returns the amount of all entities stored in the model
 
     $model1->count();
 
-=item * print()
+=head2 print()
 
 prints the whole model in nastran format to STDOUT
 
     $model->print();              # prints to STDOUT
 
-=back
-
 =head1 LIMITATIONS
 
-only bulk data is supported. only 8-field nastran format is supported. the larger the model in memory, the slowier gets filtering -> no indexing.
+only bulk data is supported. only 8-field nastran format is supported. the larger the model, the slowlier is filtering.
 
 =head1 NEXTSTEPS
 
-implement index, ...
+index for faster filtering
 
 =head1 TAGS
 
-CA, CAE, FEA, FEM, Nastran, Finite Elements, perl, CAE Automation, CAE Automatisierung
+CA, CAE, FEA, FEM, Nastran, perl, Finite Elements, CAE Automation, CAE Automatisierung
 
 =head1 AUTHOR
 
