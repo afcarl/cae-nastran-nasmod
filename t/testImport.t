@@ -9,7 +9,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 1) testing full import
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	$model->importBulk("spl/model.nas");
 	
 	# entity count
@@ -21,7 +21,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 2) testing import filtered cards
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID", "CTRIA"],
 	);
@@ -33,7 +33,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 3) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		filter => ["", ["GRID","CTRIA3"]],
 	);
@@ -45,7 +45,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 4) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID"],
 		maxoccur => 2
@@ -58,7 +58,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 5) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID"],
 		filter => ["", "", "4"]
@@ -71,7 +71,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 6) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		filter => ["234567"]
 	);
@@ -84,7 +84,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 7) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 #		cards => ["GRID"],
 		filter => ["wichtig"]
@@ -97,7 +97,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 8) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID"],
 		filter => ["wichtig"]
@@ -110,7 +110,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 9) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID"],
 		filter => [["wichtig", "234567"]]
@@ -123,7 +123,7 @@ use CAE::Nastran::Nasmod;
 #------------------------------
 # 10) testing import filtered cards and filtered data
 {
-	my $model = Nasmod->new();
+	my $model = CAE::Nastran::Nasmod->new();
 	my %OPTIONS = (
 		cards => ["GRID"],
 		filter => ["", "", "", "", "", "", "", "", "", "", "", "", 198]
