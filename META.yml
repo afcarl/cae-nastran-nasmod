@@ -1,47 +1,27 @@
-  my $distmeta = {
-    name => 'Nasmod',
-    abstract => 'basic access to nastran models',
-    description =>  "CAE::Nastran::Nasmod parses nastran models, "
-      . "with an api it is possible to access or change certain data fields, "
-      . "reduce data with a filter and write model to file",
-    version  => '[% version %]',
-    release_status => 'beta',
-    author   => ['Alexander Vogel <avoge@cpan.org>'],
-    license  => [ 'perl_5' ],
-    no_index  => {
-    	directory => ['spl/model.nas' ],
-    },
-    prereqs => {
-      runtime => {
-        requires => {
-          'perl'   => '5.006',
-        },
-      },
-      build => {
-        requires => {
-          'Test' => '0',
-        },
-      }
-    },
-    provides => {
-    	'CAE::Nastran::Nasmod' => {
-    		file => 'lib/CAE/Nastran/Nasmod.pm',
-    		version => '[% version %]',
-    	},
-    	'CAE::Nastran::Nasmod::Entity' => {
-    		file => 'lib/CAE/Nastran/Nasmod/Entity.pm',
-    		version => '[% version %]',
-    	},
-    },
-    resources => {
-      license => ['http://dev.perl.org/licenses/'],
-    },
-    dynamic_config => 0,
-    keywords => [ qw/ CA CAE FEA FEM Nastran Finite-Elements perl CAE-Automation CAE-Automatisierung / ],
-    'meta-spec' => {
-      version => '2',
-      url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
-    },
-    generated_by => 'Module::Build version 0.36',
-  };
- 
+--- #YAML:1.3
+name: CAE-Nastran-Nasmod
+abstract: basic access to nastran models
+version: [% version %]
+author:
+  - Alexander Vogel <avoge@cpan.org>
+license: perl
+distribution_type: module
+build_requires:
+  Test: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  homepage: http://prozesskraft.de
+  bugtracker: https://github.com/alexvogel/cae-nastran-nasmod/issues
+  repository: https://github.com/alexvogel/cae-nastran-nasmod
+  git: git://github.com/alexvogel/cae-nastran-nasmod.git
+  twitter: https://twitter.com/prozesskraft
+keywords
+  - CA
+  - CAE
+  - FEA
+  - FEM
+  - nastran
+  - Finite-Elements
+  - perl
+  - CAE-Automation
+  - CAE-Automatisierung
