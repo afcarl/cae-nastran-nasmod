@@ -492,9 +492,9 @@ prints the whole model in nastran format to STDOUT
 
 only bulk data is supported. only 8-field nastran format is supported. the larger the model, the slowlier is filtering.
 
-=head1 NEXTSTEPS
+=head1 TODO
 
-index for faster filtering
+indexing to accelerate filtering
 
 =head1 TAGS
 
