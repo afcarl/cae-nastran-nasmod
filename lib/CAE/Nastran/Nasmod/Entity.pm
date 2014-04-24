@@ -286,3 +286,115 @@ sub print
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+CAE::Nastran::Nasmod::Entity - an entity of a nastran model with basic access.
+
+=head1 SYNOPSIS
+
+    use CAE::Nastran::Nasmod;
+
+    # create object of a nastran model
+    my $model = CAE::Nastran::Nasmod->new();
+
+    # import content from a nastran file
+    $model->importBulk("file.inc");
+
+    # filter for GRIDs
+    my $model2 = $model->filter("", "GRID");
+
+    # write GRIDs to new file
+    $model2->print("newFile.nas");
+
+=head1 DESCRIPTION
+
+create new entities, set data fields, extract data, match against filters and print data
+
+=head1 API
+
+=head2 new()
+
+creates and returns a new Entity
+
+    # create a new Entity
+    my $entity = CAE::Nastran::Nasmod::Entity->new();
+
+=head2 setComment()
+
+sets the comment of the entity (and deletes existent comment)
+
+    # set a new comment
+    $entity->setComment("hi there");
+    
+    # set a new comment
+    $entity->setComment("im the first line", "and i'm the second one");
+    
+    # set a new comment
+    my @comment = ("i'm the first line", "and i'm the second one");
+    $entity->setComment(\@comment);
+    
+=head2 addComment()
+
+adds a line of comment
+
+    # add a line
+    $entity->addComment("hi there");
+    
+    # add a second line
+    $entity->addComment("i'm the second line");
+
+=head2 setCol()
+
+sets the value for a certain column
+
+    # set column 1 to value 'hello'
+    $entity->setCol(1, 'hello');
+
+=head2 getCol()
+
+gets the value of a certain column
+
+    # get column 1
+    my $value = $entity->getCol(1);
+
+=head2 getRow()
+
+returns all data columns as an array.
+
+    my @row = $entity->getRow();
+
+=head2 match()
+
+match all data against a filter. returns true if filter matches otherwise returns undef
+
+    # filter for GRID (NID=1000)
+    my @filter = (
+        "",                   # pos 0 filters comment:  entities pass which match // in the comment. (comment => no anchors in the regex)
+        "GRID",               # pos 1 filters column 1: only entities pass which match /^GRID$/ in column 1. (note the anchors in the regex)
+        "1000"                # pos 2 filters column 2: entities pass which match /^1000$/ in column 2. (note the anchors in the regex)
+        ""                    # pos 3 filters column 3: entities pass which match // in column 3. (empty => no anchors in the regex)
+    )
+
+    my $result = $entity->match(\@filter);
+
+=head2 print()
+
+prints the entity in nastran format to STDOUT
+
+    $entity->print();              # prints to STDOUT
+
+=head1 TAGS
+
+CA, CAE, FEA, FEM, Nastran, perl, Finite Elements, CAE Automation, CAE Automatisierung
+
+=head1 AUTHOR
+
+Alexander Vogel <avoge@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012-2014, Alexander Vogel, All Rights Reserved.
+You may redistribute this under the same terms as Perl itself.

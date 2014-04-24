@@ -6,15 +6,12 @@ author:
   - Alexander Vogel <avoge@cpan.org>
 license: perl
 distribution_type: module
+requires:
+  perl: 5.005
 build_requires:
   Test: 0
 resources:
   license: http://dev.perl.org/licenses/
-  homepage: http://prozesskraft.de
-  bugtracker: https://github.com/alexvogel/cae-nastran-nasmod/issues
-  repository: https://github.com/alexvogel/cae-nastran-nasmod
-  git: git://github.com/alexvogel/cae-nastran-nasmod.git
-  twitter: https://twitter.com/prozesskraft
 keywords
   - CA
   - CAE
@@ -25,3 +22,10 @@ keywords
   - perl
   - CAE-Automation
   - CAE-Automatisierung
+provides:
+  CAE::Nastran::Nasmod:
+    file: lib/CAE/Nastran/Nasmod.pm
+    version: [% version %]
+  CAE::Nastran::Nasmod::Entity:
+    file: lib/CAE/Nastran/Nasmod/Entity.pm
+    version: [% version %]

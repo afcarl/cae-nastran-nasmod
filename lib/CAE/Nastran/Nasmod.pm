@@ -366,6 +366,13 @@ import a nastran model from files, filter content, extract data, overwrite data,
 
 =head1 API
 
+=head2 new()
+
+creates and returns a new Nasmod
+
+    # create a new Nasmod
+    my $model = CAE::Nastran::Nasmod->new();
+
 =head2 import()
 
 imports a Nastran model from file. it only imports nastran bulk data. no sanity checks will be performed - duplicate ids or the like are possible.
@@ -455,12 +462,6 @@ adds entities to a model.
 
     # adds the entities to the model
     $model->addEntity($entity, $entity2);
-
-=head2 getRow()
-
-returns all data columns of an entity as an array.
-
-    my @row = $entity->getRow();
 
 =head2 merge()
 
