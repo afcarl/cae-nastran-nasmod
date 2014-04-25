@@ -1,4 +1,4 @@
-Revision history for Perl extension Nasmod.
+Revision history for Perl extension CAE::Nastran::Nasmod.
 
 0.20  Thu Apr 17 14:36:50 2014
 	- original version; created by h2xs 1.23 with options

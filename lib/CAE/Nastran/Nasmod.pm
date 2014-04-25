@@ -41,7 +41,7 @@ sub print
 		if (stat $outfile)
 		{
 			print("error: file does already exist. " . $outfile . "\n");
-			return 0;
+			return undef;
 		}
 	}
 
@@ -69,7 +69,7 @@ sub print
 		close SAVE;
 	}
 	
-	return 1;
+	return "true";
 }
 #---------------------
 

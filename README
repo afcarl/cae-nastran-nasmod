@@ -25,7 +25,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Nasmod::Entity
+  CAE::Nastran::Nasmod::Entity
 
 COPYRIGHT AND LICENCE
 
