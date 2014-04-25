@@ -3,7 +3,6 @@ use Test;
 
 BEGIN { plan tests => 9 }
 
-use lib("lib");
 use CAE::Nastran::Nasmod;
 
 #------------------------------
