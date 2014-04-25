@@ -77,7 +77,7 @@ sub print
 # imports data from a nastran file
 # optional filtering possible
 #---------------------
-sub import
+sub importBulk
 {
 	my $self = shift;
 	my $path = shift;
@@ -384,7 +384,7 @@ CAE::Nastran::Nasmod - basic access to nastran models
     my $model = CAE::Nastran::Nasmod->new();
 
     # import content from a nastran file
-    $model->import("file.nas");
+    $model->importBulk("file.nas");
 
     # filter for GRIDs
     my $model2 = $model->filter("", "GRID");
@@ -400,12 +400,12 @@ import a nastran model from files, filter content, extract data, overwrite data,
 
 =head2 new()
 
-creates and returns a new Nasmod
+creates and returns a new and empty nastran model
 
     # create a new Nasmod
     my $model = CAE::Nastran::Nasmod->new();
 
-=head2 import()
+=head2 importBulk()
 
 imports a Nastran model from file. it only imports nastran bulk data. no sanity checks will be performed - duplicate ids or the like are possible.
 
@@ -418,13 +418,13 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
     )
 
     # create object of a nastran model
-    my $model = new Nastranmodel();
+    my $model = CAE::Nastran::Nasmod->new();
     
     # adds all bulk data of a file
-    $model->import("file.inc");
+    $model->importBulk("file.inc");
     
     # adds only the bulk data of the file, that passes the filter
-    $model->import("file2.inc", \%OPTIONS);
+    $model->importBulk("file2.inc", \%OPTIONS);
 
 =head2 filter()
 
