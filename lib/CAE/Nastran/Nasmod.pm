@@ -428,7 +428,7 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
 
 =head2 filter()
 
-returns a new Nasmod with only the entities that pass the whole filter. A filter is an array of regexes. $filter[0] is the regex for the comment, $filter[1] is the regex for column 1 of the nastran cards, $filter[2] is the regex for column 2 ... A nastran card passes a filter if every filter-entry matches the correspondent column or comment. Everything passes an empty filter-entry. The filter-entry for the comment matches without anchors. filter-entries for data columns will always match with anchors (^$). A filter-entry for a column may be an array with alternatives - in this case only one alternative has to match.
+returns a new Nasmod with only the entities that pass the whole filter. A filter is an array of regexes. $filter[0] is the regex for the comment, $filter[1] is the regex for column 1 of the nastran card, $filter[2] is the regex for column 2 ... A nastran card passes the filter if every filter-entry matches the correspondent column or comment. Everything passes an empty filter-entry. The filter-entry for the comment matches without anchors. filter-entries for data columns will always match with anchors (^$). A filter-entry may be an array with alternatives - in this case only one alternative has to match.
 
     # filter for GRID (NID=1000)
     my @filter = (
