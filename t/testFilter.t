@@ -11,7 +11,7 @@ use CAE::Nastran::Nasmod;
 # 1), 2) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	ok($model->count(), 6);
 
@@ -30,7 +30,7 @@ use CAE::Nastran::Nasmod;
 # 3) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER = (
 		"",
@@ -47,7 +47,7 @@ use CAE::Nastran::Nasmod;
 # 4) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER = (
 		["23456","wichtig"],
@@ -64,7 +64,7 @@ use CAE::Nastran::Nasmod;
 # 5) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER;
 	$FILTER[0] = ["23456","wichtig"];
@@ -80,7 +80,7 @@ use CAE::Nastran::Nasmod;
 # 6) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER;
 	$FILTER[1] = "GRID";
@@ -96,7 +96,7 @@ use CAE::Nastran::Nasmod;
 # 7) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER;
 	$FILTER[1] = "GRID";
@@ -112,7 +112,7 @@ use CAE::Nastran::Nasmod;
 # 8) testing filter
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	my @FILTER;
 	$FILTER[1] = "GRID";

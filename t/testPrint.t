@@ -9,7 +9,7 @@ use CAE::Nastran::Nasmod;
 # 1) import file and write content to a new file. import the new file
 {
 	my $model = CAE::Nastran::Nasmod->new();
-	$model->importBulk("spl/model.nas");
+	$model->import("spl/model.nas");
 	
 	# entity count
 	ok($model->count(), 6);
@@ -17,7 +17,7 @@ use CAE::Nastran::Nasmod;
 	$model->print("spl/model_roundtrip.nas");
 
 	my $model2 = CAE::Nastran::Nasmod->new();
-	$model2->importBulk("spl/model_roundtrip.nas");
+	$model2->import("spl/model_roundtrip.nas");
 
 	# entity count
 	ok($model2->count(), 6);

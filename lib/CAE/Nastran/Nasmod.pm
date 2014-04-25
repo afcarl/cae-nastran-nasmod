@@ -77,7 +77,7 @@ sub print
 # imports data from a nastran file
 # optional filtering possible
 #---------------------
-sub importBulk
+sub import
 {
 	my $self = shift;
 	my $path = shift;
@@ -384,7 +384,7 @@ CAE::Nastran::Nasmod - basic access to nastran models
     my $model = CAE::Nastran::Nasmod->new();
 
     # import content from a nastran file
-    $model->importBulk("file.inc");
+    $model->import("file.nas");
 
     # filter for GRIDs
     my $model2 = $model->filter("", "GRID");
@@ -428,7 +428,7 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
 
 =head2 filter()
 
-returns a new Nastranmodel with only the entities that pass the whole filter. A filter is an array of regexes. $filter[0] is the regex for the comment, $filter[1] is the regex for column 1 of the nastran cards, $filter[2] is the regex for column 2 ... A nastran card passes a filter if every filter-entry matches the correspondent column or comment. Everything passes an empty filter-entry. The filter-entry for the comment matches without anchors. filter-entries for data columns will always match with anchors (^$). A filter-entry for a column may be an array with alternatives - in this case only one alternative has to match.
+returns a new Nasmod with only the entities that pass the whole filter. A filter is an array of regexes. $filter[0] is the regex for the comment, $filter[1] is the regex for column 1 of the nastran cards, $filter[2] is the regex for column 2 ... A nastran card passes a filter if every filter-entry matches the correspondent column or comment. Everything passes an empty filter-entry. The filter-entry for the comment matches without anchors. filter-entries for data columns will always match with anchors (^$). A filter-entry for a column may be an array with alternatives - in this case only one alternative has to match.
 
     # filter for GRID (NID=1000)
     my @filter = (
