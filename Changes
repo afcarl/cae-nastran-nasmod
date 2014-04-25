@@ -20,3 +20,8 @@ Revision history for Perl extension Nasmod.
 0.25 Wed Apr 24
     - pod for nested module
     - improving META.yml
+
+0.26 Wed Apr 25
+    - improving pod / META.yml
+    - printing nastran model to file
+    - more tests

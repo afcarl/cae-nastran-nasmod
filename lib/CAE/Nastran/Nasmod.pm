@@ -26,18 +26,50 @@ sub new
 }
 
 #---------------------
-# prints the whole model
+# prints the whole model to STDOUT or a file
 # print()
-# return: -
+# return: 0 | 1
 #---------------------
 sub print
 {
     my $self = shift;
 
+	my $outfile = undef;
+	if (@_)
+	{
+		$outfile = shift(@_);
+		if (stat $outfile)
+		{
+			print("error: file does already exist. " . $outfile . "\n");
+			return 0;
+		}
+	}
+
+	# if an outfile has been defined, redirect STDOUT to this file
+	if($outfile)
+	{
+		open (SAVE, ">&STDOUT") or die "can't save STDOUT $!\n";
+		open (STDOUT, '>', $outfile) or die "can't redirect STDOUT to " . $outfile . ": $!";
+	}
+
+#	print "WOOOOOPP\n";
+#	print "anzahl der entities: " . scalar(@{$self->{'bulk'}}) . "\n";
+
+	# print each entity
 	foreach my $entity (@{$self->{'bulk'}})
 	{
 		$entity->print();
 	}
+	
+	# remove redirection of STDOUT
+	if($outfile)
+	{
+		close STDOUT;
+		open (STDOUT, ">&SAVE") or die "can't restore STDOUT $!\n";
+		close SAVE;
+	}
+	
+	return 1;
 }
 #---------------------
 
@@ -357,8 +389,8 @@ CAE::Nastran::Nasmod - basic access to nastran models
     # filter for GRIDs
     my $model2 = $model->filter("", "GRID");
 
-    # write GRIDs to new file
-    $model2->print("newFile.nas");
+    # print to a file
+    $model2->print("file.nas");
 
 =head1 DESCRIPTION
 
@@ -380,7 +412,7 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
     # define options and filter
     my %OPTIONS = (
         cards => ["GRID", "CTRIA"],         # fastest way to reduce data while importing. only mentioned cardnames will be imported. the values in 'cards' match
-                                            # without a trailing anchor "CTRIA" matches "CTRIA3" and "CTRIA6"
+                                            # always without a trailing anchor => "CTRIA" matches "CTRIA3" and "CTRIA6"
         filter => ["", "", 10],             # only the content passing this filter will be imported. same dataformat as in filter().
         maxoccur => 5                       # stops the import if this amount of entities has been imported.
     )
@@ -484,9 +516,10 @@ returns the amount of all entities stored in the model
 
 =head2 print()
 
-prints the whole model in nastran format to STDOUT
+prints the whole model in nastran format to STDOUT or to a file.
 
     $model->print();              # prints to STDOUT
+    $model->print("file.nas");    # prints to file.nas
 
 =head1 LIMITATIONS
 

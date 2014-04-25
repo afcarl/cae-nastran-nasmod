@@ -266,8 +266,11 @@ sub sprint
 		my @ausgabe;
 		for(my $x=(0+$zeile*10); ( ($x<@{$self->{content}}) && ($x<(10+$zeile*10)) ); $x++)
 		{
-			$formatstring .= "%-8.8s";
-			push @ausgabe, ${$self->{content}}[$x];
+			if(defined ${$self->{content}}[$x])
+			{
+				push(@ausgabe, ${$self->{content}}[$x]);
+				$formatstring .= "%-8.8s";
+			}
 		}
 		$return .= sprintf $formatstring."\n", @ausgabe;
 	}
@@ -291,24 +294,26 @@ __END__
 
 =head1 NAME
 
-CAE::Nastran::Nasmod::Entity - an entity of a nastran model with basic access.
+CAE::Nastran::Nasmod::Entity - an entity of a nastran model
 
 =head1 SYNOPSIS
 
-    use CAE::Nastran::Nasmod;
+    use CAE::Nastran::Nasmod::Entity;
 
-    # create object of a nastran model
-    my $model = CAE::Nastran::Nasmod->new();
+    # create new Entity (an empty nastran card)
+    my $entity = CAE::Nastran::Nasmod::Entity->new();
 
-    # import content from a nastran file
-    $model->importBulk("file.inc");
+	# define its content
+    $entity->setComment("just a test"); # comment
+    $entity->setCol(1, "GRID");         # column 1: cardname
+    $entity->setCol(2, 1000);           # column 2: id
+    $entity->setCol(4, 17);             # column 4: x
+    $entity->setCol(5, 120);            # column 5: y
+    $entity->setCol(6, 88);             # column 6: z
 
-    # filter for GRIDs
-    my $model2 = $model->filter("", "GRID");
-
-    # write GRIDs to new file
-    $model2->print("newFile.nas");
-
+    # print entity to STDOUT
+    $entity->print();
+    
 =head1 DESCRIPTION
 
 create new entities, set data fields, extract data, match against filters and print data
@@ -338,7 +343,7 @@ sets the comment of the entity (and deletes existent comment)
     
 =head2 addComment()
 
-adds a line of comment
+adds a line of comment to an entity without deleting existent comment
 
     # add a line
     $entity->addComment("hi there");
