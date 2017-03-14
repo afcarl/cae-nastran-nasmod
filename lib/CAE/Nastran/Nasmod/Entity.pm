@@ -64,6 +64,18 @@ sub setComment
 #---------------------
 
 #---------------------
+# returns the comment
+# getComment()
+# return: $comment
+#---------------------
+sub getComment
+{
+	my $self = shift;
+	return join("\n", @{$self->{'comment'}});
+}
+#---------------------
+
+#---------------------
 # sets a certain column to a certain value
 # setCol(<int>, <string>)
 #---------------------
@@ -73,7 +85,7 @@ sub setCol
 	my $col = shift;
 	my $string = shift;
 
-	$self->{content}->[$col-1] = $string;
+	$self->{content}->[$col] = $string;
 }
 #---------------------
 
@@ -87,9 +99,11 @@ sub getCol
 	my $self = shift;
 	my $col = shift;
 	
-	if ($self->{content}->[$col-1])
+	if ($col == 0) {return $self->getComment();}
+	
+	elsif ($self->{content}->[$col])
 	{
-		return $self->{content}->[$col-1];
+		return $self->{content}->[$col];
 	}
 	else {return""};
 }
@@ -104,6 +118,18 @@ sub getRow
 {
 	my $self = shift;
 	return @{$self->{'content'}}
+}
+#---------------------
+
+#---------------------
+# set row data
+# setRow(\@rowdata)
+# return: -
+#---------------------
+sub setRow
+{
+	my $self = shift;
+	@{$self->{'content'}} = @{$_[0]};
 }
 #---------------------
 
@@ -126,10 +152,11 @@ sub match
 
 	my @colFilterResults;
 	
-	# falls ein filter fuer dem Kommentar gesetzt wurde, wir der vollstaendige kommentar untersucht
+	# CHECK COMMENT
 	# falls der filter dort greift wird auf "true" gesetzt.
-	if ($$refa_filter[0])
+	if (defined $$refa_filter[0])
 	{
+
 		if(!(ref($$refa_filter[0]) =~ m/array/i))
 		{
 			$colFilterResults[0] = "false";
@@ -152,14 +179,11 @@ sub match
 			$colFilterResults[0] = "false";
 			foreach my $vergleichsString (@{${$refa_filter}[0]})
 			{
-				foreach my $commentzeile (@{$self->{'comment'}})
+#				print "finde ich $vergleichsString in: " . $self->getComment() . "?\n";
+				if ( $self->getComment() =~ m/$vergleichsString/ )
 				{
-#					print "TEST $vergleichsString on comment '" . $commentzeile ."'\n";
-					if ( $commentzeile =~ m/$vergleichsString/ )
-					{
-#						print "RESULT IS TRUE\n";
-						$colFilterResults[0] = "true";
-					}
+#					print "RESULT IS TRUE\n";
+					$colFilterResults[0] = "true";
 				}
 			}
 		}
@@ -179,8 +203,9 @@ sub match
 			# mit 'false' beginnen
 			$colFilterResults[$col] = "false";
 
+
 			# und es sich dabei nicht um ein ARRAY handelt
-#			print "IST ES EIN ARRAY? " . $$refa_filter[$row] . "||" .ref($$refa_filter[$row]) ."\n";
+#			print "IST ES EIN ARRAY? " . ${$refa_filter}[$col] . "||" .ref(${$refa_filter}[$col]) ."\n";
 			if(!(ref($$refa_filter[$col]) =~ m/array/i))
 			{
 				# wenn der filter dieses rows greift, dann auf 'true' setzen
@@ -370,6 +395,18 @@ gets the value of a certain column
 returns all data columns as an array.
 
     my @row = $entity->getRow();
+
+=head2 setRow()
+
+sets the comment and the data of an entity. this method is much faster than setting each column seperatly with setCol().
+
+    # pos0: comment
+    # pos1: column 1
+    # pos2: column 2
+    # ...
+    my @row = ("this is a comment", "GRID", 100, "", 1.5, 100.65, 22.8);
+    
+    $entity->setRow(\@row);
 
 =head2 match()
 

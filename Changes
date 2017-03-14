@@ -27,6 +27,6 @@ Revision history for Perl extension CAE::Nastran::Nasmod.
     - more tests
 
 x.xx
-    - error correction documentation
-    
+    - accelleration of importBulk()
+
     

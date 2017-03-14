@@ -2,6 +2,9 @@ package CAE::Nastran::Nasmod;
 
 use strict;
 use warnings;
+use Data::Dumper;
+use Tie::Hash::Regex;
+
 use CAE::Nastran::Nasmod::Entity;
 use vars qw($VERSION $ABSTRACT $DATE);
 
@@ -19,11 +22,86 @@ sub new
     {
 		"bulk" => [],
 		"tmp" => [],
+		"index" => {},				# in pos0 = \%index_of_col0
     };
 
     bless ($self, $class);
     return $self;
 }
+
+#---------------------
+# clone object
+# clone($self)
+# returns: Nasmod
+#---------------------
+sub clone
+{
+	my $self = shift;
+	
+	my $copy = bless {%$self}, ref $self;
+	
+	return $copy;
+}
+#---------------------
+
+#---------------------
+# creates an index for a certain column
+# index($col, $col, etc)
+# return: 0 | 1
+#---------------------
+sub index
+{
+	my $self = shift;
+	
+	my %index;
+	
+	# create for every desired column an empty index hash
+	foreach(@_)
+	{
+		my %tmp;
+		tie %tmp, 'Tie::Hash::Regex';
+		
+		$index{$_} = \%tmp;
+	}
+	
+#	print Dumper (@index);
+#	
+	# go through all entities 
+	foreach my $entity ($self->getEntity())
+	{
+		# add entity to indexes
+		foreach(@_)
+		{
+			if($_==0)
+			{
+				push(@{${$index{$_}}{$entity->getComment($_)}}, $entity);
+			}
+			else
+			{
+				push(@{${$index{$_}}{$entity->getCol($_)}}, $entity);
+			}
+		}
+	}
+
+	$self->{'index'} = \%index;
+}
+#---------------------
+
+#---------------------
+# is an index present?
+# hasIndex()
+# return: 0 | 1
+#---------------------
+sub hasIndex
+{
+	my $self = shift;
+	
+	if(scalar( keys %{$self->{'index'}}))
+	{
+		return 1;
+	}
+}
+#---------------------
 
 #---------------------
 # prints the whole model to STDOUT or a file
@@ -73,45 +151,26 @@ sub print
 }
 #---------------------
 
+
 #---------------------
-# imports data from a nastran file
-# optional filtering possible
+# alias for importData()
 #---------------------
 sub importBulk
 {
 	my $self = shift;
+	$self->importData(@_);
+}
+#---------------------
+
+#---------------------
+# imports data from a nastran file
+# optional filtering possible
+#---------------------
+sub importData
+{
+	my $self = shift;
 	my $path = shift;
 	my $refh_options;
-
-	if(@_)
-	{
-		$refh_options = shift;
-	}
-
-	if (!open (MODEL, "<$path")) {die "cannot read $path"}
-
-	my @model = <MODEL>;
-	chomp @model;
-	close MODEL;
-
-	$self->{'tmp'} = \@model;
-
-	if ($refh_options)
-    {
-    	$self->parse($refh_options);
-    }
-    else
-    {
-    	$self->parse();
-    }
-}
-
-#---------------------
-# parse bulkdata and store entity-objects in show
-#---------------------
-sub parse
-{
-    my $self = shift;
 
     my $maxoccur;
     my $occur = 0;
@@ -137,16 +196,20 @@ sub parse
 	    }
     }
 
+	if (!open (MODEL, "<$path")) {die "cannot read $path"}
+
    	my $entity;
 	my @comment;
 
 	my $just_skipped = 0;
 
 	my $folgezeile = 0;
+	
+	# each line of bulk
+	while (my $line = <MODEL>)
+	{
+		chomp $line;
 
-    # each line of bulk
-	foreach my $line (@{$self->{tmp}})
-    {
     	# if its a comment
     	if ($line =~ m/^\$/)
     	{
@@ -154,54 +217,60 @@ sub parse
 #	    	print "-----\n";
 # 	    	print "COMMENT: $line\n";
     	}
-    	
+
     	# if its an entity
     	else
     	{
 
 			# sofort ueberpruefen ob die karte ueberhaupt eingelesen werden soll
-			if (($cards) && ($line =~ m/^\w+/) && ($line !~ m/^$cards/))
+			if (($cards) && ($line !~ m/^$cards/))
+#			if (($cards) && ($line =~ m/^\w+/) && ($line !~ m/^$cards/))
 			{
 				$just_skipped = 1;
 				undef @comment;
 				next;
 			}
-			
+
 			# zeile zerteilen
-    		my @line = &split8($line);
-			
+			my @line = &split8($line);
+
 			# handelt es sich um die erste Zeile einer Karte?
-    		if ($line =~ m/^\w+/)
+			if ($line =~ m/^\w+/)
 			{
 				$just_skipped = 0;
 				$folgezeile = 0;
-				
+
     			# first store previous entity-object if available and if matches the filter
     			if ($entity)
     			{
-   					# greift der filter? dann ablegen | ist $maxoccur erreicht? dann abbrechen
-   					if($entity->match($refa_filter))
-   					{
-#   						print "FILTER GREIFT fuer Zeile: $line\n";
-   						$self->addEntity($entity);
-   						$occur++;
+					# greift der filter? dann ablegen | ist $maxoccur erreicht? dann abbrechen
+					if($entity->match($refa_filter))
+					{
+#						print "hinzufuegen des entity: \n";
+#						$entity->print();
+						$self->addEntity($entity);
+						$occur++;
 	   					if( ($maxoccur) && ($maxoccur <= $occur) )
-	   					{
+						{
 	   						return;
-	   					}
-   					}
-    			}
+						}
+					}
+				}
     			
-    			# ein neues entity anlegen
-    			$entity = CAE::Nastran::Nasmod::Entity->new();
-    			$entity->setComment(@comment);
-    			undef(@comment);
+				# ein neues entity anlegen
+				$entity = CAE::Nastran::Nasmod::Entity->new();
+				$entity->setComment(@comment);
+				undef(@comment);
     			
-    			# die zerhackte zeile durchgehen und in einem entity ablegen
-    			for(my $x=0, my $col=1; $x<@line; $x++, $col++)
-    			{
-    				$entity->setCol($col, $line[$x]);
-    			}
+    			# da es die erste zeile ist, kann man diese mit setRow setzen
+    			$entity->setRow(\@line);
+    			
+#				# die zerhackte zeile durchgehen und in einem entity ablegen
+#				for(my $x=0, my $col=1; $x<@line; $x++, $col++)
+#				{
+#					
+#					$entity->setCol($col, $line[$x]);
+#				}
 			}
 			
 			# wenn kein kommentar und keine schluesselzeile, dann handelt es sich um eine folgezeile.
@@ -209,25 +278,25 @@ sub parse
 			elsif (!($just_skipped))
 			{
 				$folgezeile++;
-  
-    			# die zerhackte zeile durchgehen und in einem entity ablegen
+
+#    			# die zerhackte zeile durchgehen und in einem entity ablegen
     			for(my $x=0, my $col=(1+($folgezeile * 10)); $x<@line; $x++, $col++)
     			{
     				$entity->setCol($col, $line[$x]);
     			}
 			}
-    	}
-    }
-
+		}
+	}
 	# zum schluss die letzte entity ablegen
     if ($entity)
     {
     	if ($entity->match($refa_filter))
     	{
+#			print "hinzufuegen des entity: \n";
+#			$entity->print();
     		$self->addEntity($entity);
     	}
     }
-    			
 }
 #---------------------
 
@@ -241,8 +310,7 @@ sub split8
 	for (my $x=0; ($x*8) < length($string); $x++)
 	{
 		my $substring = substr $string, ($x*8), 8;
-		$substring =~ s/^\s+//;
-		$substring =~ s/\s+$//;
+		$substring =~ s/\s+//g;
 		push @strings, $substring;
 	}
 	return @strings;
@@ -250,14 +318,78 @@ sub split8
 #---------------------
 
 #---------------------
-# adds an entity to show
+# split a string in chunks of 8 characters
+#---------------------
+sub split8old
+{
+	my @strings;
+	foreach my $substring (unpack("A8A8A8A8A8A8A8A8A8A8", shift))
+	{
+		$substring =~ s/\s+//g;
+		push(@strings, $substring);
+	}
+	return @strings;
+}
+#---------------------
+
+#---------------------
+# adds an entity to model if it doesn't already exist.
+# not the content, but the object is checkt
+# addEntity(@entities)
+# return: 0 | 1
+#---------------------
+sub addEntityNoTwins
+{
+	my $self = shift;
+	
+	foreach my $entity (@_)
+	{
+		unless(grep { $entity eq $_ } $self->getEntity())
+		{
+			push @{$self->{bulk}}, $entity;
+		}
+	}
+}
+#---------------------
+
+#---------------------
+# adds an entity to model. if this entity already exists, it won't be added
 # addEntity(@entities)
 # return: -
 #---------------------
 sub addEntity
 {
 	my $self = shift;
+	
 	push @{$self->{bulk}}, @_;
+	
+	if($self->hasIndex())
+	{
+#		print Dumper($self->{'index'});
+		foreach my $entity (@_)
+		{
+			foreach my $col (keys %{$self->{'index'}})
+			{
+#				unless($self->{'index'}->{$col})
+#				{
+#					$self->{'index'}{$col} = [];
+#				}
+				push(@{$self->{'index'}->{$col}->{$entity->getCol($col)}}, $entity);
+			}
+		}
+	}
+}
+#---------------------
+
+#---------------------
+# remove entity
+# removeEntity(@entities)
+# return: -
+#---------------------
+sub removeEntity
+{
+#	my $self = shift;
+#	push @{$self->{bulk}}, @_;
 }
 #---------------------
 
@@ -301,28 +433,166 @@ sub filter
 	my $self = shift;
 	my $refa_filter = shift;
 	my $refh_param;
-	
+
 	if (@_)
 	{
 		$refh_param = shift;
 	}
 
-	# ein neues objekt erzeugen
+	# create new Nasmod
 	my $filtered_model = CAE::Nastran::Nasmod->new();
 
-# alle entities durchgehen
-	foreach my $entity (@{$self->{'bulk'}})
+	# is there an index for all filters?
+	if($self->hasIndex())
 	{
-		if ($entity->match($refa_filter))
+		my $indexForAllFilterPresent = 1;
+		my $indexForSomeFilterPresent = 0;
+
+		# foreach filter entry
+		for(my $col = 0; $col < @$refa_filter; $col++)
 		{
-			$filtered_model->addEntity($entity);
-			if ($refh_param->{'firstonly'})
+			# is there a filter for this column?
+			if($$refa_filter[$col] && ($$refa_filter[$col] ne ""))
 			{
-				return $filtered_model;
+				# is there an index for this column?
+				unless(defined $self->{'index'}->{$col})
+				{
+					$indexForAllFilterPresent = 0;
+					$indexForSomeFilterPresent = 1;
+				}
 			}
 		}
+
+		# filterstrategy 1
+		# if $indexForSomeFilterPresent,then generate a reduced_model for conventional search
+		if($indexForSomeFilterPresent)
+		{
+#			print "FILTER STRATEGY: indexForSomeFilterPresent\n";
+			my $reduced_model = CAE::Nastran::Nasmod->new();
+			
+			# erzeugen der obermenge
+			for(my $col = 0; $col < @$refa_filter; $col++)
+			{
+				# is there a filter for this column?
+				if($$refa_filter[$col] && ($$refa_filter[$col] ne ""))
+				{
+					my $regex;
+					
+					if($col == 0)
+					{
+						$regex = $$refa_filter[$col];
+					}
+					else
+					{
+						$regex = "^" . $$refa_filter[$col] . "\$";
+					}
+					
+					# is there an index for this column?
+					if(defined $self->{'index'}->{$col})
+					{
+						# put every entity of this index in a reduced_model
+						foreach my $refa_entities (tied(%{$self->{'index'}->{$col}})->FETCH(qr/$regex/))
+						{
+							$reduced_model->addEntityNoTwins(@$refa_entities);
+						}
+					}
+				}
+			}
+			
+			# filtering the reduced_model the conventional way
+			foreach my $entity ($reduced_model->getEntity())
+			{
+				if ($entity->match($refa_filter))
+				{
+					$filtered_model->addEntity($entity);
+					if ($refh_param->{'firstonly'})
+					{
+						return $filtered_model;
+					}
+				}
+			}
+			return $filtered_model;
+		}
+		
+		# filterstrategy 2
+		# if $indexForAllFilterPresent, then generate a filtered_model_by_index
+		elsif($indexForAllFilterPresent)
+		{
+#			print "FILTER STRATEGY: indexForAllFilterPresent\n";
+			my @filtered_entities;
+			my $first_filterrun = 1;
+			
+			for(my $col = 0; $col < @$refa_filter; $col++)
+			{
+				# is there a filter for this column?
+				if($$refa_filter[$col] && ($$refa_filter[$col] ne ""))
+				{
+					my $regex;
+					
+					if($col == 0)
+					{
+						$regex = $$refa_filter[$col];
+					}
+					else
+					{
+						$regex = "^" . $$refa_filter[$col] . "\$";
+					}
+
+					# is there an index for this column?
+					if(defined $self->{'index'}->[$col])
+					{
+						print "regex: /$regex/\n";
+						foreach my $refa_entities (tied(%{$self->{'index'}->{$col}})->FETCH(qr/$regex/))
+						{
+							if($first_filterrun)
+							{
+								print "matched ". scalar(@$refa_entities)." entities\n";
+								@filtered_entities = @$refa_entities;
+								$first_filterrun = 0;
+							}
+							else
+							{
+								print "matched ". scalar(@$refa_entities)." entities\n";
+								my @union;
+								my @isect;
+								my %union;
+								my %isect;
+							
+								foreach my $e (@filtered_entities, @$refa_entities) { $union{$e}++ && $isect{$e}++; }
+							
+								@filtered_entities = keys %isect;
+							}
+						}
+					} 
+				}
+			}
+			
+			my $filtered_model_by_index = CAE::Nastran::Nasmod->new();
+			$filtered_model_by_index->addEntity(@filtered_entities);
+			
+			return $filtered_model_by_index;
+		}
+		
 	}
-	return $filtered_model;
+
+	# filterstrategy 3
+	# alle entities durchgehen und mit filter vergleichen
+	else
+	{
+#		print "FILTER STRATEGY: conventional\n";
+		foreach my $entity (@{$self->{'bulk'}})
+		{
+			if ($entity->match($refa_filter))
+			{
+				$filtered_model->addEntity($entity);
+				if ($refh_param->{'firstonly'})
+				{
+					return $filtered_model;
+				}
+			}
+		}
+		return $filtered_model;
+	}	
 }
 #---------------------
 
@@ -384,13 +654,13 @@ CAE::Nastran::Nasmod - basic access to nastran models
     my $model = CAE::Nastran::Nasmod->new();
 
     # import content from a nastran file
-    $model->importBulk("file.nas");
+    $model->importData("file.nas");
 
     # filter for GRIDs
-    my $model2 = $model->filter("", "GRID");
+    my $model2 = $model->filter(["", "GRID"]);
 
     # print to a file
-    $model2->print("file.nas");
+    $model2->print("file2.nas");
 
 =head1 DESCRIPTION
 
@@ -405,7 +675,7 @@ creates and returns a new and empty nastran model
     # create a new Nasmod
     my $model = CAE::Nastran::Nasmod->new();
 
-=head2 importBulk()
+=head2 importData()
 
 imports a Nastran model from file. it only imports nastran bulk data. no sanity checks will be performed - duplicate ids or the like are possible.
 
@@ -421,10 +691,10 @@ imports a Nastran model from file. it only imports nastran bulk data. no sanity 
     my $model = CAE::Nastran::Nasmod->new();
     
     # adds all bulk data of a file
-    $model->importBulk("file.inc");
+    $model->importData("file.inc");
     
     # adds only the bulk data of the file, that passes the filter
-    $model->importBulk("file2.inc", \%OPTIONS);
+    $model->importData("file2.inc", \%OPTIONS);
 
 =head2 filter()
 
